@@ -71,7 +71,7 @@ try:
     lines = file.readlines()
     i = 0
     while lines:
-        if "bintype" in lines[i]:
+        if "type" in lines[i]:
                file2.write(lines[i-1] + '\n' + lines[i])
         i=i+1
     file.close()
