@@ -14,9 +14,6 @@ rec_buff = ''
 rec_buff2 = ''
 time_count = 0
 
-longitude = ''
-latitude = ''
-
 
 def send_at(command,back,timeout):
     rec_buff = ''
@@ -35,7 +32,6 @@ def send_at(command,back,timeout):
             global data
             data = rec_buff.decode()
             data = data.split(",")
-            # print(data)
             return 1
     else:
         print('GPS is not ready')
@@ -48,31 +44,26 @@ def get_gps_position():
     rec_buff = ''
     send_at('AT+CGNSPWR=1','OK',1)
     time.sleep(2)
-    while rec_null:
-        answer = send_at('AT+CGNSINF','+CGNSINF: ',1)
-        if 1 == answer:
-            answer = 0
-            if ',,,,,,' in rec_buff:
-                print('GPS is not ready')
-                rec_null = False
-                time.sleep(1)
-            else:
-                        #print(data)
-                        latitude = data[5]
-                        longitude = data[6]
-                        print(longitude)
-                        print(latitude)
-                        file = open("position.txt","w")
-                        file.write(latitude + '\n')
-                        file.write(longitude + '\n') 
-                        file.close()
+    answer = send_at('AT+CGNSINF','+CGNSINF: ',1)
+    if 1 == answer:
+        answer = 0
+        if ',,,,,,' in rec_buff:
+            print('GPS is not ready')
+            rec_null = False
+            time.sleep(1)
         else:
-            print('error %d'%answer)
-            rec_buff = ''
-            send_at('AT+CGPS=0','OK',1)
-            return False
-        time.sleep(1.5)
-
+            global latitude
+            global longitude
+            latitude = data[3]
+            print(latitude)
+            longitude = data[4]
+            print(longitude)
+    else:
+        print('error %d'%answer)
+        rec_buff = ''
+        send_at('AT+CGPS=0','OK',1)
+        return False
+    time.sleep(1.5)
 
 def power_on(power_key):
     print('SIM7600X is starting:')
@@ -85,6 +76,7 @@ def power_on(power_key):
     GPIO.output(power_key,GPIO.LOW)
     time.sleep(2)
     ser.flushInput()
+    time.sleep(60)
     print('SIM7600X is ready')
 
 def power_down(power_key):
@@ -95,9 +87,18 @@ def power_down(power_key):
     time.sleep(2)
     print('Good bye')
 
+def save_to_file(latitude,longitude):
+    file = open("position.txt","w")
+    print(latitude)
+    print(longitude)
+    file.write(latitude + '\n')
+    file.write(longitude + '\n') 
+    file.close()
+
 try:
     power_on(power_key)
     get_gps_position()
+    save_to_file(latitude,longitude)
     power_down(power_key)
 except:
     if ser != None:
