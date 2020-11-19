@@ -72,7 +72,7 @@ try:
     i = 0
     while lines:
         if "type" in lines[i]:
-               file2.write(lines[i-1] + '\n' + lines[i])
+               file2.write(lines[i] + '\n')
         i=i+1
     file.close()
     file2.close()
