@@ -81,7 +81,7 @@ try:
     
 
     send_at('AT+HTTPPARA="URL","http://18.134.93.173:8086/write?db=projekt_IoT"','OK',1)
-    send_at('AT+HTTPPARA="CONTENT","data-binary"','OK',1)
+    send_at('AT+HTTPPARA="CONTENT","data/binary"','OK',1)
     send_at(cmd,'DOWNLOAD',1)
     time.sleep(1)
     ser.write(data.encode())
