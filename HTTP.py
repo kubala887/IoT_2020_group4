@@ -13,8 +13,7 @@ APN = 'CMNET'
 ServerIP = '18.134.93.173'
 Port = '8086'
 Message = 'Waveshare'
-data = 'measures,type="KRAKOW" ID="111",long=19.888,lat=50.058,fill=96.87,track="1" 1434067467000000202'
-#data = 'measures,type="ABBA" ID="666",long=45.888,lat=50.058,fill=96.87,track="1" 1400000000000000000'
+data = 'measures,type="CITY" ID="111",long=19.888,lat=50.058,fill=96.87,track="1" 1434067467000000202'
 data_binary=data.encode()
 cmd='AT+HTTPDATA='+str(len(data))+',2000'
 print(cmd)
