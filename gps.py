@@ -5,6 +5,8 @@ import RPi.GPIO as GPIO
 
 import serial
 import time
+from datetime import datetime
+
 
 ser = serial.Serial('/dev/ttyS0',115200)
 ser.flushInput()
@@ -54,10 +56,13 @@ def get_gps_position():
         else:
             global latitude
             global longitude
+            global date_str
+            date_str = data[2]
             latitude = data[3]
-            print(latitude)
             longitude = data[4]
-            print(longitude)
+            print("Time: %s", date_str)
+            print("Latitiude: %s", latitude)
+            print("Longitude: %s", longitude)
     else:
         print('error %d'%answer)
         rec_buff = ''
@@ -87,18 +92,27 @@ def power_down(power_key):
     time.sleep(2)
     print('Good bye')
 
-def save_to_file(latitude,longitude):
+def save_position(latitude,longitude):
     file = open("position.txt","w")
-    print(latitude)
-    print(longitude)
     file.write(latitude + '\n')
     file.write(longitude + '\n') 
     file.close()
 
+def save_date(date_str):
+    print(date_str)
+    date_str = date_str.split(".")
+    print(date_str)
+    date = date_str[0]
+    date = date[0:4] + '/' + date[4:6] + '/' + date[6:8] + ' ' + date[8:10] + ':' + date[10:12] + ':' + date[12:14]
+    # print(date)
+    file = open("time.txt","w")
+    file.write(date + "\n")
+    file.close()
 try:
     power_on(power_key)
     get_gps_position()
-    save_to_file(latitude,longitude)
+    save_position(latitude,longitude)
+    save_date(date_str)
     power_down(power_key)
 except:
     if ser != None:
@@ -108,3 +122,5 @@ except:
 if ser != None:
         ser.close()
         GPIO.cleanup()  
+
+
