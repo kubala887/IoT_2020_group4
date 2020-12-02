@@ -59,11 +59,10 @@ def send_at(command, back, timeout):
 try:
     power_on(power_key)
 
-    send_at('AT+CSQ', 'OK', 1)  # signal quality report
-    send_at('AT+CPSI?', 'OK', 1)  # Inquiring UE system information
-    send_at('AT+CMGF=1', 'OK', 1)  # txt format of message
-    send_at('AT+CPMS="SM","SM","SM"', 'OK', 1)  # messages to be read from SIM message storage
-    send_at('AT+CMGL="ALL"', 'OK', 1)  # retrieving all sms messages
+    send_at('AT+CSQ', 'OK', 1)
+    send_at('AT+CMGF=1', 'OK', 1)
+    send_at('AT+CPMS="SM","SM","SM"', 'OK', 1)
+    send_at('AT+CMGL="ALL"', 'OK', 1)
 
     file = open("data.txt", "w")
     file.write(data + '\n')
@@ -71,24 +70,25 @@ try:
 
     with open('data.txt') as fd:
         text = fd.read()  # str
-        lines = text.split('\n')[::-1]  # lista wszystkich lini z tekstu (ale od końca)
+        lines = text.split('\n')[::-1]  
         for line in lines:
-            if 'type' in line:  # linia ze słowem 'type' ostatni z pliku np.: type: type1, size: 176, routeID: 2
-                values = line.split(',')  # linia zamieniona na liste: ['type: type1', ' size: 176', ' routeID: 2']
+            if 'type' in line:  
+                values = line.split(',')  
                 new_text = ''
 
                 for value in values:
                     try:
-                        k, v = value.split(':')  # ['type', ' type1']
-                        k = k.strip()  # 'type'
-                        v = v.strip()  # 'type1'
-                        if k == 'type':
-                            v = "'" + v + "'"  # 'type1'
-                        elif v in ['', ' ']:  # sprawdzamy parametry inne niż 'type'; 
+                        k, v = value.split(':')  
+                        k = k.strip() 
+                        v = v.strip()  
+                        if k == 'binType':
+                            v = "'" + v + "'" 
+                        elif v in ['', ' ']: 
                             v = '0'
                         new_value = k + ' = ' + v + '\n'
                         new_text = new_text + new_value
                         with open('sms.txt', 'w') as fd_w:
+                            fd_w.write('[sms]' + '\n'
                             fd_w.write(new_text)
                     except Exception:
                         pass
