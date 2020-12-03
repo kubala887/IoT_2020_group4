@@ -94,7 +94,7 @@ def power_down(power_key):
 
 def save_position(latitude,longitude):
     file = open("position.txt","w")
-    file.write('[position]')
+    file.write('[position]' + '\n')
     file.write('latitude = ' + latitude + '\n')
     file.write('longitude = ' + longitude + '\n') 
     file.close()
