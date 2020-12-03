@@ -94,8 +94,9 @@ def power_down(power_key):
 
 def save_position(latitude,longitude):
     file = open("position.txt","w")
-    file.write(latitude + '\n')
-    file.write(longitude + '\n') 
+    file.write('[position]')
+    file.write('latitude = ' + latitude + '\n')
+    file.write('longitude = ' + longitude + '\n') 
     file.close()
 
 def set_date(date_str):
@@ -107,7 +108,7 @@ def set_date(date_str):
         subprocess.call([command], shell=True)
 
     except subprocess.CalledProcessError:
-                print("Cannot set time and date")
+        print("Cannot set time and date")
 
 try:
     power_on(power_key)
@@ -123,6 +124,7 @@ except:
 if ser != None:
         ser.close()
         GPIO.cleanup()  
+  
 
 
 
