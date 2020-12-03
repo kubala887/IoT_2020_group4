@@ -98,21 +98,22 @@ def save_position(latitude,longitude):
     file.write(longitude + '\n') 
     file.close()
 
-def save_date(date_str):
-    print(date_str)
-    date_str = date_str.split(".")
-    print(date_str)
-    date = date_str[0]
-    date = date[0:4] + '/' + date[4:6] + '/' + date[6:8] + ' ' + date[8:10] + ':' + date[10:12] + ':' + date[12:14]
-    # print(date)
-    file = open("time.txt","w")
-    file.write(date + "\n")
-    file.close()
+def set_date(date_str):
+    try:
+        date_str = date_str.split(".")
+        date = date_str[0]
+        date = date[0:4] + '/' + date[4:6] + '/' + date[6:8] + ' ' + date[8:10] + ':' + date[10:12] + ':' + date[12:14]
+        command = 'date +%Y%m%d%H%M%S -s "{}"'.format(date)
+        subprocess.call([command], shell=True)
+
+    except subprocess.CalledProcessError:
+                print("Cannot set time and date")
+
 try:
     power_on(power_key)
     get_gps_position()
     save_position(latitude,longitude)
-    save_date(date_str)
+    set_date(date_str)
     power_down(power_key)
 except:
     if ser != None:
@@ -122,5 +123,6 @@ except:
 if ser != None:
         ser.close()
         GPIO.cleanup()  
+
 
 
