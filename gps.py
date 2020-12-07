@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 
 import serial
 import time
+import os 
 from datetime import datetime
 
 
@@ -45,7 +46,7 @@ def get_gps_position():
     print('Start GPS session...')
     rec_buff = ''
     send_at('AT+CGNSPWR=1','OK',1)
-    time.sleep(2)
+    time.sleep(120)
     answer = send_at('AT+CGNSINF','+CGNSINF: ',1)
     if 1 == answer:
         answer = 0
@@ -60,9 +61,8 @@ def get_gps_position():
             date_str = data[2]
             latitude = data[3]
             longitude = data[4]
-            print("Time: %s", date_str)
-            print("Latitiude: %s", latitude)
-            print("Longitude: %s", longitude)
+            print('Latitiude: ' + latitude)
+            print('Longitude: ' + longitude)
     else:
         print('error %d'%answer)
         rec_buff = ''
@@ -104,10 +104,10 @@ def set_date(date_str):
         date_str = date_str.split(".")
         date = date_str[0]
         date = date[0:4] + '/' + date[4:6] + '/' + date[6:8] + ' ' + date[8:10] + ':' + date[10:12] + ':' + date[12:14]
-        command = 'date +%Y%m%d%H%M%S -s "{}"'.format(date)
-        subprocess.call([command], shell=True)
-
-    except subprocess.CalledProcessError:
+        print('Time: '+ date)
+        command = 'sudo date +%Y%m%d%H%M%S -s "{}"'.format(date)
+        os.system(command)
+    except:
         print("Cannot set time and date")
 
 try:
@@ -124,7 +124,5 @@ except:
 if ser != None:
         ser.close()
         GPIO.cleanup()  
-  
-
 
 
