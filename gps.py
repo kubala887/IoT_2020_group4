@@ -37,38 +37,38 @@ def send_at(command,back,timeout):
             data = data.split(",")
             return 1
     else:
-        print('GPS is not ready')
         return 0
 
 def get_gps_position():
     rec_null = True
-    answer = 0
+    info_answer = 0
+    session_answer = 0
     print('Start GPS session...')
     rec_buff = ''
-    send_at('AT+CGNSPWR=1','OK',1)
-    time.sleep(120)
-    answer = send_at('AT+CGNSINF','+CGNSINF: ',1)
-    if 1 == answer:
-        answer = 0
+    while 0 == session_answer:
+        session_answer = send_at('AT+CGNSPWR=1','OK',1)
         if ',,,,,,' in rec_buff:
-            print('GPS is not ready')
+            print('GPS is still not ready ...')
             rec_null = False
-            time.sleep(1)
-        else:
-            global latitude
-            global longitude
-            global date_str
-            date_str = data[2]
-            latitude = data[3]
-            longitude = data[4]
-            print('Latitiude: ' + latitude)
-            print('Longitude: ' + longitude)
+            time.sleep(60)
+    info_answer = send_at('AT+CGNSINF','+CGNSINF: ',1)
+    if 1 == info_answer:
+        info_answer = 0
+        global latitude
+        global longitude
+        global date_str
+        date_str = data[2]
+        latitude = data[3]
+        longitude = data[4]
+        print('Latitiude: ' + latitude)
+        print('Longitude: ' + longitude)
     else:
         print('error %d'%answer)
         rec_buff = ''
         send_at('AT+CGPS=0','OK',1)
         return False
     time.sleep(1.5)
+
 
 def power_on(power_key):
     print('SIM7600X is starting:')
@@ -81,7 +81,7 @@ def power_on(power_key):
     GPIO.output(power_key,GPIO.LOW)
     time.sleep(2)
     ser.flushInput()
-    time.sleep(60)
+    time.sleep(2)
     print('SIM7600X is ready')
 
 def power_down(power_key):
@@ -105,7 +105,7 @@ def set_date(date_str):
         date = date_str[0]
         date = date[0:4] + '/' + date[4:6] + '/' + date[6:8] + ' ' + date[8:10] + ':' + date[10:12] + ':' + date[12:14]
         print('Time: '+ date)
-        command = 'sudo date +%Y%m%d%H%M%S -s "{}"'.format(date)
+        command = 'sudo date +%Y%m%d%H%M%S -s "{}" -u'.format(date)
         os.system(command)
     except:
         print("Cannot set time and date")
@@ -124,5 +124,3 @@ except:
 if ser != None:
         ser.close()
         GPIO.cleanup()  
-
-
