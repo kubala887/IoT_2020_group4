@@ -1,0 +1,5 @@
+[sms]
+binType = 'CITY'
+size = 100.0
+track = 55
+ID = 50

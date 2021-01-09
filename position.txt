@@ -1,0 +1,3 @@
+[position]
+latitude = 50.067546
+longitude = 19.916467

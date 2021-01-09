@@ -1,13 +1,17 @@
-#!/usr/bin/python
 # -*- coding:utf-8 -*-
+#title           :gps.py
+#description     :Script for getting coordinates and time from GPS
+#author          :Damian Piasecki
+#date            :20201216   
+#==============================================================================
+
 
 import RPi.GPIO as GPIO
 
 import serial
 import time
-import os 
+import os
 from datetime import datetime
-
 
 ser = serial.Serial('/dev/ttyS0',115200)
 ser.flushInput()
@@ -16,7 +20,6 @@ power_key = 4
 rec_buff = ''
 rec_buff2 = ''
 time_count = 0
-
 
 def send_at(command,back,timeout):
     rec_buff = ''
@@ -69,7 +72,6 @@ def get_gps_position():
         return False
     time.sleep(1.5)
 
-
 def power_on(power_key):
     print('SIM7600X is starting:')
     GPIO.setmode(GPIO.BCM)
@@ -110,17 +112,27 @@ def set_date(date_str):
     except:
         print("Cannot set time and date")
 
-try:
-    power_on(power_key)
-    get_gps_position()
-    save_position(latitude,longitude)
-    set_date(date_str)
-    power_down(power_key)
-except:
+def getPosAndSave():
+    try:
+        ser = serial.Serial('/dev/ttyS0',115200)
+        ser.flushInput()
+
+        power_key = 4
+        rec_buff = ''
+        rec_buff2 = ''
+        time_count = 0
+        
+        power_on(power_key)
+        get_gps_position()
+        save_position(latitude,longitude)
+        set_date(date_str)
+        power_down(power_key)
+    except:
+        if ser != None:
+            ser.close()
+        power_down(power_key)
+        GPIO.cleanup()
     if ser != None:
-        ser.close()
-    power_down(power_key)
-    GPIO.cleanup()
-if ser != None:
-        ser.close()
-        GPIO.cleanup()  
+            ser.close()
+            GPIO.cleanup()
+

@@ -1,5 +1,9 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#title           :sms.py
+#description     :Script for receiving SMS messages with coordination for the module
+#author          :Natalia Muryn
+#date            :20201216   
+#==============================================================================
+
 
 import RPi.GPIO as GPIO
 import serial
@@ -10,7 +14,6 @@ ser.flushInput()
 
 power_key = 5
 rec_buff = ''
-
 
 def power_on(power_key):
     print('SIM7600X is starting:')
@@ -55,53 +58,58 @@ def send_at(command, back, timeout):
     else:
         print(command + ' no responce')
 
+def readMessages():
+    try:
+        ser = serial.Serial('/dev/ttyS0', 115200)
+        ser.flushInput()
 
-try:
-    power_on(power_key)
+        power_key = 5
+        rec_buff = ''
+        
+        power_on(power_key)
 
-    send_at('AT+CSQ', 'OK', 1)
-    send_at('AT+CMGF=1', 'OK', 1)
-    send_at('AT+CPMS="SM","SM","SM"', 'OK', 1)
-    send_at('AT+CMGL="ALL"', 'OK', 1)
+        send_at('AT+CSQ', 'OK', 1)
+        send_at('AT+CMGF=1', 'OK', 1)
+        send_at('AT+CPMS="SM","SM","SM"', 'OK', 1)
+        send_at('AT+CMGL="ALL"', 'OK', 1)
 
-    file = open("data.txt", "w")
-    file.write(data + '\n')
-    file.close()
+        file = open("data.txt", "w")
+        file.write(data + '\n')
+        file.close()
 
-    with open('data.txt') as fd:
-        text = fd.read()  # str
-        lines = text.split('\n')[::-1]  
-        for line in lines:
-            if 'type' in line:  
-                values = line.split(',')  
-                new_text = ''
+        with open('data.txt') as fd:
+            text = fd.read()  # str
+            lines = text.split('\n')[::-1]  
+            for line in lines:
+                if 'type' in line:  
+                    values = line.split(',')  
+                    new_text = ''
 
-                for value in values:
-                    try:
-                        k, v = value.split(':')  
-                        k = k.strip() 
-                        v = v.strip()  
-                        if k == 'binType':
-                            v = "'" + v + "'" 
-                        elif v in ['', ' ']: 
-                            v = '0'
-                        new_value = k + ' = ' + v + '\n'
-                        new_text = new_text + new_value
-                        with open('sms.txt', 'w') as fd_w:
-                            fd_w.write('[sms]' + '\n'
-                            fd_w.write(new_text)
-                    except Exception:
-                        pass
-                break
+                    for value in values:
+                        try:
+                            k, v = value.split(':')  
+                            k = k.strip() 
+                            v = v.strip()  
+                            if k == 'binType':
+                                v = "'" + v + "'" 
+                            elif v in ['', ' ']: 
+                                v = '0'
+                            new_value = k + ' = ' + v + '\n'
+                            new_text = new_text + new_value
+                            with open('sms.txt', 'w') as fd_w:
+                                fd_w.write('[sms]' + '\n')
+                                fd_w.write(new_text)
+                        except Exception:
+                            pass
+                    break
 
-    power_down(power_key)
+        power_down(power_key)
 
-except:
+    except:
+        if ser != None:
+            ser.close()
+            GPIO.cleanup()
+
     if ser != None:
         ser.close()
         GPIO.cleanup()
-
-if ser != None:
-    ser.close()
-    GPIO.cleanup()
-
